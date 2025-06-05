@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talky Setup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    #vanta-bg {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      z-index: -1;
+    }
+    select {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+      color: #fff;
+    }
+    option {
+      background-color: #111827;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <!-- VANTA Background -->
+  <div id="vanta-bg"></div>
+
+  <!-- Main Layout -->
+  <div class="flex flex-col lg:flex-row items-center lg:items-start justify-center min-h-screen px-4 lg:px-20">
+    
+    <!-- Form Box -->
+    <div class="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-lg text-white border border-yellow-300 lg:mt-32 lg:mr-auto">
+      <h1 class="text-3xl font-bold mb-6 text-yellow-300">Setup Your Chat Style</h1>
+
+      <!-- Tone -->
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold text-yellow-200">Tone</label>
+        <select id="tone" class="w-full p-2 rounded-lg outline-none">
+          <option>Flirt</option>
+          <option>Polite</option>
+          <option>Mentor</option>
+          <option>Funny</option>
+        </select>
+      </div>
+
+      <!-- Accent -->
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold text-yellow-200">Accent</label>
+        <select id="accent" class="w-full p-2 rounded-lg outline-none">
+          <option>American</option>
+          <option>Asian</option>
+          <option>British</option>
+          <option>Indian</option>
+        </select>
+      </div>
+
+      <!-- Style -->
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold text-yellow-200">Style</label>
+        <select id="style" class="w-full p-2 rounded-lg outline-none">
+          <option>Straight to the Point</option>
+          <option>Trash Talk</option>
+          <option>Detailed Guide</option>
+          <option>Casual Chill</option>
+        </select>
+      </div>
+
+      <!-- Emotion -->
+      <div class="mb-6">
+        <label class="block mb-1 font-semibold text-yellow-200">Emotional Connection</label>
+        <select id="emotion" class="w-full p-2 rounded-lg outline-none">
+          <option>Minimal</option>
+          <option>Medium</option>
+          <option>Extreme</option>
+        </select>
+      </div>
+
+      <!-- Save Button -->
+      <button id="saveBtn" class="w-full bg-yellow-400 text-black font-semibold py-2 rounded-lg hover:bg-yellow-300 transition">
+        Save & Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- VANTA Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+  <script>
+    VANTA.BIRDS({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      backgroundColor: 0x07152f,
+      color1: 0x54beff,
+      color2: 0xbc27ff,
+      cohesion: 19.00
+    });
+  </script>
+</body>
+</html>

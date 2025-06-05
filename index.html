@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+  <!-- VANTA.js & THREE.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+
+  <!-- Firebase compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body { font-family: 'Share Tech Mono', monospace; }
+    canvas { z-index: 0 !important; position: fixed !important; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between">
+  <div id="vanta-bg" style="position:fixed;width:100%;height:100%;top:0;left:0;z-index:0;"></div>
+
+  <div class="z-10 text-center bg-yellow-300 text-red-800 py-2 font-semibold">
+    Site by Parth D Soni — In Development Mode
+  </div>
+
+  <div class="flex-grow flex items-center justify-center z-10 relative p-4">
+    <div class="w-full max-w-sm bg-white bg-opacity-20 backdrop-blur p-6 rounded-xl">
+      <div class="flex mb-4 rounded-lg overflow-hidden">
+        <button class="flex-1 bg-white text-black py-2 rounded-l-lg" disabled>Sign Up</button>
+        <a href="login.html" class="flex-1 bg-black text-white py-2 text-center rounded-r-lg">Log In</a>
+      </div>
+
+      <h2 class="text-white text-xl mb-6 text-center">Sign Up</h2>
+
+      <button id="googleSignIn" class="w-full mb-3 bg-white text-black rounded-full py-2.5 flex items-center justify-center gap-2">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" />
+        Continue with Google
+      </button>
+
+      <button id="githubSignIn" class="w-full mb-3 bg-black text-white rounded-full py-2.5 flex items-center justify-center gap-2">
+        <i class="fab fa-github fa-lg"></i> Continue with GitHub
+      </button>
+
+      <p class="text-xs text-white mt-4 text-center">
+        By clicking Sign Up, you accept our 
+        <a href="tandc.html" class="underline text-yellow-400">Terms</a> and 
+        <a href="privacy-policy.html" class="underline text-yellow-400">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+
+  <footer class="text-white text-center p-4 z-10">
+    Made with ❤️ by Parth D Soni
+  </footer>
+
+  <script>
+  window.addEventListener("DOMContentLoaded", () => {
+    VANTA.FOG({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      minHeight: 200,
+      minWidth: 200,
+      highlightColor: 0xffffff,
+      midtoneColor: 0x000000,
+      lowlightColor: 0x000000,
+      baseColor: 0xffffff,
+      blurFactor: 0.25,
+      speed: 0.70,
+      zoom: 0.40
+    });
+  });
+</script>
+<script>
+
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBl8p8yt9bVcpzIsCcjorNxd1U2JvyO5Eo",
+    authDomain: "talky-f85c3.firebaseapp.com",
+    projectId: "talky-f85c3",
+    storageBucket: "talky-f85c3.appspot.com",
+    messagingSenderId: "364967146528",
+    appId: "1:364967146528:web:c8b3833f48d6bb5b0b3845"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // EmailJS init after DOM is ready
+  window.onload = () => {
+    emailjs.init("TTQfZE-WsggriSBdF");
+  };
+
+  // Send Welcome Email
+  function sendWelcomeEmail(user) {
+    if (!user || !user.email) return;
+    emailjs.send("service_cym0v8j", "template_ilnbspn", {
+      name: user.displayName || user.email,
+      email: user.email
+    }).then(res => {
+      console.log("✅ Email sent:", res.text);
+    }).catch(err => {
+      console.error("❌ Email failed:", err);
+    });
+  }
+
+  // Handle Result Logic (reused)
+  function handleAuthResult(result) {
+    const user = result.user;
+    const isNew = result.additionalUserInfo?.isNewUser;
+
+    if (user) {
+      alert("Welcome " + (user.displayName || user.email));
+      sendWelcomeEmail(user);
+
+      // Redirect Logic
+      if (isNew) {
+        window.location.href = "setup.html";
+      } else {
+        window.location.href = "home.html";
+      }
+    }
+  }
+
+  // Google Sign-In
+  document.getElementById("googleSignIn").addEventListener("click", () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(handleAuthResult)
+      .catch(error => alert("Google Login Error: " + error.message));
+  });
+
+  // GitHub Sign-In
+  document.getElementById("githubSignIn").addEventListener("click", () => {
+    const provider = new firebase.auth.GithubAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(handleAuthResult)
+      .catch(error => alert("GitHub Login Error: " + error.message));
+  });
+</script>
+
+</body>
+</html>

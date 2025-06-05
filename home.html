@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Erick - Always Connected</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+    #vanta-bg {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body class="text-white">
+
+  <!-- Vanta Background -->
+  <div id="vanta-bg"></div>
+
+  <!-- Header -->
+  <header class="flex items-center justify-between p-4">
+    <div class="text-xl font-bold">🤖 Erick</div>
+    <div class="text-sm opacity-80">Always Connected</div>
+  </header>
+
+  <!-- Chat Interface -->
+  <main class="flex flex-col items-center justify-center px-4 py-6 md:py-20">
+    <div class="w-full max-w-3xl bg-white bg-opacity-10 backdrop-blur-md rounded-2xl shadow-2xl p-6 space-y-4">
+      <div class="h-96 overflow-y-auto p-4 rounded-lg bg-black bg-opacity-30 text-sm" id="chat-box"></div>
+
+      <form id="chat-form" class="flex space-x-2">
+        <input id="chat-input" type="text" placeholder="Type your message..." class="flex-1 p-3 rounded-lg text-black outline-none" />
+        <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded-lg font-semibold">Send</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Vanta.js & Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+  <script>
+    VANTA.FOG({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      highlightColor: 0x54beff,
+      midtoneColor: 0xbc27ff,
+      lowlightColor: 0x0c0e2c,
+      baseColor: 0x000000,
+      blurFactor: 0.5,
+      speed: 1.2,
+      zoom: 1.0
+    });
+  </script>
+  <script>
+async function fetchErickPrompt() {
+  const response = await fetch("erickpromp.json");
+  return await response.json();
+}
+
+async function askErick(userMessage) {
+  const promptData = await fetchErickPrompt();
+
+  const fullPrompt = `${promptData.systemPrompt}\n\nUser: ${userMessage}\nErick:`;
+
+  const res = await fetch("https://my-openai-proxy.repl.co/openai.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: promptData.systemPrompt },
+        { role: "user", content: userMessage }
+      ]
+    })
+  });
+
+  const data = await res.json();
+  const erickReply = data.choices?.[0]?.message?.content || "uhh error 💀";
+
+  // Display Erick's response (adjust to your UI)
+  document.getElementById("chat-response").innerText = erickReply;
+}
+</script>
+
+
+  <!-- Chat Logic -->
+  <script>
+    const chatForm = document.getElementById('chat-form');
+    const inputField = document.getElementById('chat-input');
+    const chatBox = document.getElementById('chat-box');
+
+    // ✅ Replace with your Replit backend URL
+    const BACKEND_URL = "https://12f543e1-5812-4db6-a004-c2398a544af3-00-oi6ema4nb088.sisko.replit.dev/";
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = inputField.value.trim();
+      if (!message) return;
+
+      appendMessage('You', message);
+      inputField.value = '';
+
+      try {
+        const res = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        appendMessage('Erick', data.reply || '[No reply]');
+      } catch (err) {
+        appendMessage('Erick', '[Error contacting AI]');
+        console.error('Fetch error:', err);
+      }
+    });
+
+    function appendMessage(sender, text) {
+      const msg = document.createElement('div');
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
